@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Image Upload</title>
+</head>
+<body>
+    <video id="videoElement" autoplay></video>
+    <button id="captureButton">Capture Image</button>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <img id="capturedImage" src="" alt="Captured Image" style="display: none; max-width: 100%;">
+
+    <form id="uploadForm" action="upload.php" method="post" style="display: none;">
+        <input type="hidden" id="imageData" name="imageData">
+        <input type="submit" value="Upload Image">
+    </form>
+
+    <script>
+        const video = document.getElementById("videoElement");
+        const canvas = document.getElementById("canvas");
+        const capturedImage = document.getElementById("capturedImage");
+        const captureButton = document.getElementById("captureButton");
+        const uploadForm = document.getElementById("uploadForm");
+        const imageDataInput = document.getElementById("imageData");
+
+        async function getCameraStream() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (error) {
+                console.error("Error accessing the camera: ", error);
+            }
+        }
+
+        captureButton.addEventListener("click", () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+            capturedImage.src = canvas.toDataURL("image/jpeg");
+            capturedImage.style.display = "block";
+            uploadForm.style.display = "block";
+            imageDataInput.value = capturedImage.src;
+        });
+
+        window.onload = () => {
+            getCameraStream();
+        };
+    </script>
+</body>
+</html>
